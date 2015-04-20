@@ -135,6 +135,10 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
 
   const store = new Store(...argsForClass)
 
+  if (config.bindListeners) {
+    store.bindListeners(config.bindListeners)
+  }
+
   storeInstance = assign(
     new AltStore(
       alt,
@@ -143,6 +147,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
       StoreModel
     ),
     getInternalMethods(StoreModel),
+    config.publicMethods,
     { displayName: key }
   )
 

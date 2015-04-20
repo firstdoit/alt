@@ -979,8 +979,9 @@ function NoopClass() {}
 var builtIns = Object.getOwnPropertyNames(NoopClass);
 var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
 
-function getInternalMethods(obj, isProto) {
+function getInternalMethods(Obj, isProto) {
   var excluded = isProto ? builtInProto : builtIns;
+  var obj = isProto ? Obj.prototype : Obj;
   return Object.getOwnPropertyNames(obj).reduce(function (value, m) {
     if (excluded.indexOf(m) !== -1) {
       return value;
@@ -1382,7 +1383,11 @@ function createStoreFromClass(alt, StoreModel, key) {
 
   var store = new (_bind.apply(Store, [null].concat(argsForClass)))();
 
-  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), _getInternalMethods.getInternalMethods(StoreModel), { displayName: key });
+  if (config.bindListeners) {
+    store.bindListeners(config.bindListeners);
+  }
+
+  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), _getInternalMethods.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
 
   return storeInstance;
 }
@@ -1590,7 +1595,7 @@ var Alt = (function () {
 
       if (typeof ActionsClass === 'function') {
         (function () {
-          _assign2['default'](actions, _dispatchIdentity$formatAsConstant$getInternalMethods$uid$warn.getInternalMethods(ActionsClass.prototype, true));
+          _assign2['default'](actions, _dispatchIdentity$formatAsConstant$getInternalMethods$uid$warn.getInternalMethods(ActionsClass, true));
 
           var ActionsGenerator = (function (_ActionsClass) {
             function ActionsGenerator() {
