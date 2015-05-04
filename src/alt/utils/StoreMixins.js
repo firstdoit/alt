@@ -1,4 +1,5 @@
 import Symbol from 'es-symbol'
+import { eachObject } from './AltUtils'
 import {
   ACTION_KEY,
   ALL_LISTENERS,
@@ -28,13 +29,13 @@ export const StoreMixinEssentials = {
   },
 
   exportPublicMethods(methods) {
-    Object.keys(methods).forEach((methodName) => {
-      if (typeof methods[methodName] !== 'function') {
+    eachObject((methodName, value) => {
+      if (typeof value !== 'function') {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[PUBLIC_METHODS][methodName] = methods[methodName]
-    })
+      this[PUBLIC_METHODS][methodName] = value
+    }, [methods])
   },
 
   emitChange() {
@@ -71,8 +72,7 @@ export const StoreMixinListeners = {
   },
 
   bindActions(actions) {
-    Object.keys(actions).forEach((action) => {
-      const symbol = actions[action]
+    eachObject((action, symbol) => {
       const matchFirstCharacter = /./
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
@@ -96,12 +96,11 @@ export const StoreMixinListeners = {
       if (handler) {
         this.bindAction(symbol, handler)
       }
-    })
+    }, [actions])
   },
 
   bindListeners(obj) {
-    Object.keys(obj).forEach((methodName) => {
-      const symbol = obj[methodName]
+    eachObject((methodName, symbol) => {
       const listener = this[methodName]
 
       if (!listener) {
@@ -117,7 +116,6 @@ export const StoreMixinListeners = {
       } else {
         this.bindAction(symbol, listener)
       }
-    })
+    }, [obj])
   }
-
 }

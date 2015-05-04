@@ -1,5 +1,5 @@
 import AltStore from '../AltStore'
-import { assign, getInternalMethods } from './AltUtils'
+import { assign, eachObject, getInternalMethods } from './AltUtils'
 import {
   StoreMixinEssentials,
   StoreMixinListeners
@@ -79,13 +79,9 @@ export function createStoreFromObject(alt, StoreModel, key) {
   // bind the lifecycle events
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
-    Object.keys(StoreProto.lifecycle).forEach((event) => {
-      StoreMixinListeners.on.call(
-        StoreProto,
-        event,
-        StoreProto.lifecycle[event]
-      )
-    })
+    eachObject((eventName, event) => {
+      StoreMixinListeners.on.call(StoreProto, eventName, event)
+    }, [StoreProto.lifecycle])
   }
 
   // create the instance and assign the public methods to the instance

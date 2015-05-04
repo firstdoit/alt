@@ -23,6 +23,7 @@ import {
 import {
   assign,
   dispatchIdentity,
+  eachObject,
   formatAsConstant,
   getInternalMethods,
   uid,
@@ -125,26 +126,25 @@ class Alt {
 
     this.actions[key] = this.actions[key] || {}
 
-    return Object.keys(actions).reduce((obj, action) => {
-      if (typeof actions[action] !== 'function') {
-        return obj
+    eachObject((actionName, action) => {
+      if (typeof action !== 'function') {
+        return
       }
 
       // create the action
-      obj[action] = makeAction(
+      exportObj[actionName] = makeAction(
         this,
         key,
+        actionName,
         action,
-        actions[action],
-        obj
+        exportObj
       )
 
       // generate a constant
-      const constant = formatAsConstant(action)
-      obj[constant] = obj[action][ACTION_KEY]
-
-      return obj
-    }, exportObj)
+      const constant = formatAsConstant(actionName)
+      exportObj[constant] = exportObj[actionName][ACTION_KEY]
+    }, [actions])
+    return exportObj
   }
 
   takeSnapshot(...storeNames) {
