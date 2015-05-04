@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3'
-import assign from 'object-assign'
 import Symbol from 'es-symbol'
 import * as Sym from './symbols/symbols'
+import { assign } from './utils/AltUtils'
 
 const {
   ALL_LISTENERS,
@@ -23,9 +23,6 @@ export default class AltStore {
     this._storeName = model._storeName
     this.boundListeners = model[ALL_LISTENERS]
     this.StoreModel = StoreModel
-    if (typeof this.StoreModel === 'object') {
-      this.StoreModel.state = assign({}, StoreModel.state)
-    }
 
     assign(this[LIFECYCLE], model[LIFECYCLE])
     assign(this, model[PUBLIC_METHODS])

@@ -1,4 +1,3 @@
-import assign from 'object-assign'
 import { Dispatcher } from 'flux'
 
 import makeAction from './utils/makeAction'
@@ -22,6 +21,7 @@ import {
   LIFECYCLE
 } from './symbols/symbols'
 import {
+  assign,
   dispatchIdentity,
   formatAsConstant,
   getInternalMethods,

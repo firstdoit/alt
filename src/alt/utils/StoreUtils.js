@@ -1,7 +1,5 @@
-import assign from 'object-assign'
-
 import AltStore from '../AltStore'
-import { getInternalMethods } from './AltUtils'
+import { assign, getInternalMethods } from './AltUtils'
 import {
   StoreMixinEssentials,
   StoreMixinListeners
@@ -39,10 +37,7 @@ function doSetState(store, storeInstance, state) {
 export function createStoreConfig(globalConfig, StoreModel) {
   StoreModel.config = assign({
     getState(state) {
-      return Object.keys(state).reduce((obj, key) => {
-        obj[key] = state[key]
-        return obj
-      }, {})
+      return assign({}, state)
     },
     setState: assign
   }, globalConfig, StoreModel.config)
