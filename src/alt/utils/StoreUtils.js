@@ -1,5 +1,6 @@
 import AltStore from '../AltStore'
-import { assign, eachObject, getInternalMethods } from './AltUtils'
+import { assign, eachObject, isFunction } from '../../utils/functions'
+import { getInternalMethods } from './AltUtils'
 import {
   StoreMixinEssentials,
   StoreMixinListeners
@@ -19,7 +20,7 @@ function doSetState(store, storeInstance, state) {
 
   const { config } = storeInstance.StoreModel
 
-  const nextState = typeof state === 'function'
+  const nextState = isFunction(state)
     ? state(storeInstance[STATE_CONTAINER])
     : state
 

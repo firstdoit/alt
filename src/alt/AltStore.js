@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import Symbol from 'es-symbol'
 import * as Sym from './symbols/symbols'
-import { assign } from './utils/AltUtils'
+import { assign } from '../utils/functions'
 
 const {
   ALL_LISTENERS,

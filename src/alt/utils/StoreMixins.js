@@ -1,5 +1,6 @@
 import Symbol from 'es-symbol'
-import { eachObject } from './AltUtils'
+
+import { eachObject, isFunction } from '../../utils/functions'
 import {
   ACTION_KEY,
   ALL_LISTENERS,
@@ -30,7 +31,7 @@ export const StoreMixinEssentials = {
 
   exportPublicMethods(methods) {
     eachObject((methodName, value) => {
-      if (typeof value !== 'function') {
+      if (!isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
@@ -52,7 +53,7 @@ export const StoreMixinListeners = {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
     }
-    if (typeof handler !== 'function') {
+    if (!isFunction(handler)) {
       throw new TypeError('bindAction expects a function')
     }
 

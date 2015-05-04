@@ -21,14 +21,17 @@ import {
   LIFECYCLE
 } from './symbols/symbols'
 import {
-  assign,
   dispatchIdentity,
-  eachObject,
   formatAsConstant,
   getInternalMethods,
   uid,
   warn
 } from './utils/AltUtils'
+import {
+  assign,
+  eachObject,
+  isFunction
+} from '../utils/functions'
 
 class Alt {
   constructor(config = {}) {
@@ -53,9 +56,9 @@ class Alt {
     createStoreConfig(this.config, StoreModel)
     const Store = transformStore(this.storeTransforms, StoreModel)
 
-    return typeof Store === 'object'
-      ? createStoreFromObject(this, Store, key)
-      : createStoreFromClass(this, Store, key, ...args)
+    return isFunction(Store)
+      ? createStoreFromClass(this, Store, key, ...args)
+      : createStoreFromObject(this, Store, key)
   }
 
   createStore(StoreModel, iden, ...args) {
@@ -76,9 +79,9 @@ class Alt {
       key = uid(this.stores, key)
     }
 
-    const storeInstance = typeof Store === 'object'
-      ? createStoreFromObject(this, Store, key)
-      : createStoreFromClass(this, Store, key, ...args)
+    const storeInstance = isFunction(Store)
+      ? createStoreFromClass(this, Store, key, ...args)
+      : createStoreFromObject(this, Store, key)
 
     this.stores[key] = storeInstance
     saveInitialSnapshot(this, key)
@@ -105,7 +108,7 @@ class Alt {
       ActionsClass.displayName || ActionsClass.name || 'Unknown'
     )
 
-    if (typeof ActionsClass === 'function') {
+    if (isFunction(ActionsClass)) {
       assign(actions, getInternalMethods(ActionsClass.prototype, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
@@ -127,7 +130,7 @@ class Alt {
     this.actions[key] = this.actions[key] || {}
 
     eachObject((actionName, action) => {
-      if (typeof action !== 'function') {
+      if (!isFunction(action)) {
         return
       }
 
