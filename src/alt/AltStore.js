@@ -5,6 +5,7 @@ import * as Sym from './symbols/symbols'
 
 const {
   ALL_LISTENERS,
+  HANDLING_ERRORS,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
@@ -17,7 +18,7 @@ const EE = Symbol()
 export default class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = new EventEmitter()
-    this[LIFECYCLE] = {}
+    this[LIFECYCLE] = model[LIFECYCLE]
     this[STATE_CONTAINER] = state || model
 
     this._storeName = model._storeName
@@ -27,14 +28,11 @@ export default class AltStore {
       this.StoreModel.state = assign({}, StoreModel.state)
     }
 
-    assign(this[LIFECYCLE], model[LIFECYCLE])
     assign(this, model[PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
-      if (model[LIFECYCLE].beforeEach) {
-        model[LIFECYCLE].beforeEach(payload, this[STATE_CONTAINER])
-      }
+      this[LIFECYCLE].emit('beforeEach', payload, this[STATE_CONTAINER])
 
       if (model[LISTENERS][payload.action]) {
         let result = false
@@ -42,8 +40,8 @@ export default class AltStore {
         try {
           result = model[LISTENERS][payload.action](payload.data)
         } catch (e) {
-          if (this[LIFECYCLE].error) {
-            this[LIFECYCLE].error(e, payload, this[STATE_CONTAINER])
+          if (model[HANDLING_ERRORS]) {
+            this[LIFECYCLE].emit('error', e, payload, this[STATE_CONTAINER])
           } else {
             throw e
           }
@@ -54,14 +52,10 @@ export default class AltStore {
         }
       }
 
-      if (model[LIFECYCLE].afterEach) {
-        model[LIFECYCLE].afterEach(payload, this[STATE_CONTAINER])
-      }
+      this[LIFECYCLE].emit('afterEach', payload, this[STATE_CONTAINER])
     })
 
-    if (this[LIFECYCLE].init) {
-      this[LIFECYCLE].init()
-    }
+    this[LIFECYCLE].emit('init')
   }
 
   getEventEmitter() {
@@ -78,9 +72,7 @@ export default class AltStore {
   }
 
   unlisten(cb) {
-    if (this[LIFECYCLE].unlisten) {
-      this[LIFECYCLE].unlisten()
-    }
+    this[LIFECYCLE].emit('unlisten')
     this[EE].removeListener('change', cb)
   }
 

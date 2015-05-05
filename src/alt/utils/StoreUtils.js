@@ -1,4 +1,5 @@
 import assign from 'object-assign'
+import EventEmitter from 'eventemitter3'
 
 import AltStore from '../AltStore'
 import { getInternalMethods } from './AltUtils'
@@ -57,7 +58,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
 
   const StoreProto = {}
   StoreProto[ALL_LISTENERS] = []
-  StoreProto[LIFECYCLE] = {}
+  StoreProto[LIFECYCLE] = new EventEmitter()
   StoreProto[LISTENERS] = {}
 
   assign(StoreProto, {
@@ -129,7 +130,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   })
 
   Store.prototype[ALL_LISTENERS] = []
-  Store.prototype[LIFECYCLE] = {}
+  Store.prototype[LIFECYCLE] = new EventEmitter()
   Store.prototype[LISTENERS] = {}
   Store.prototype[PUBLIC_METHODS] = {}
 

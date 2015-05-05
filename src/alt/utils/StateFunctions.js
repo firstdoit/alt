@@ -29,9 +29,7 @@ export function snapshot(instance, storeNames = []) {
     const storeName = storeHandle.displayName || storeHandle
     const store = instance.stores[storeName]
     const { config } = store.StoreModel
-    if (store[LIFECYCLE].snapshot) {
-      store[LIFECYCLE].snapshot()
-    }
+    store[LIFECYCLE].emit('snapshot')
     const customSnapshot = config.onSerialize &&
       config.onSerialize(store[STATE_CONTAINER])
     obj[storeName] = customSnapshot ? customSnapshot : store.getState()

@@ -2,6 +2,7 @@ import Symbol from 'es-symbol'
 import {
   ACTION_KEY,
   ALL_LISTENERS,
+  HANDLING_ERRORS,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS
@@ -42,7 +43,10 @@ export const StoreMixinEssentials = {
 
 export const StoreMixinListeners = {
   on(lifecycleEvent, handler) {
-    this[LIFECYCLE][lifecycleEvent] = handler.bind(this)
+    if (lifecycleEvent === 'error') {
+      this[HANDLING_ERRORS] = true
+    }
+    this[LIFECYCLE].on(lifecycleEvent, handler.bind(this))
   },
 
   bindAction(symbol, handler) {
